@@ -1,0 +1,1 @@
+cur.execute("CREATE TABLE Users(username, password)")
