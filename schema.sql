@@ -14,8 +14,7 @@ CREATE TABLE "Following" (
 
 CREATE TABLE "Tweets" (
     "user" TEXT,
-    "time" INTEGER,
-    "date" INTEGER,
+    "timestamp" INTEGER,
     "tweet" TEXT,
     FOREIGN KEY("user") REFERENCES "Users"("username")
 );
