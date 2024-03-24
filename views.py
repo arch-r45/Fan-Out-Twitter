@@ -90,6 +90,19 @@ def update(user_id: str, tweet: str):
     else:
         return {"status": "Failure", "message": "Tweet Unsuccesful"} 
 
+
+@app.get("/timeline")
+def get_timeline(user_id):
+    res = cur.execute("""SELECT user, tweet, timestamp FROM Tweets WHERE user IN(
+                        SELECT followee FROM Following WHERE (follower = ?))""", (user_id,))
+    
+    tweets = res.fetchall()
+    print(tweets)
+    return {"status": "Success", "message": "Success"}
+
+    
+
+
     
 
 
