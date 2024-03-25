@@ -22,6 +22,7 @@ You need to compile all the users Tweets and sort them by time
 
 """
 from fastapi import FastAPI
+import json
 import sqlite3
 from datetime import datetime
 app = FastAPI()
@@ -90,15 +91,27 @@ def update(user_id: str, tweet: str):
     else:
         return {"status": "Failure", "message": "Tweet Unsuccesful"} 
 
-
 @app.get("/timeline")
 def get_timeline(user_id):
     res = cur.execute("""SELECT user, tweet, timestamp FROM Tweets WHERE user IN(
                         SELECT followee FROM Following WHERE (follower = ?))""", (user_id,))
     
     tweets = res.fetchall()
-    print(tweets)
-    return {"status": "Success", "message": "Success"}
+    hash_map = {}
+    categories = ["Username", "Tweet", "Time"]
+    for i, tweet in enumerate(tweets):
+        hash_map[i] = [
+            (categories[0], tweet[0]),
+            (categories[1], tweet[1]),
+            (categories[2], tweet[2]),
+        ]
+
+
+    json_object = json.dumps(hash_map)
+    print(hash_map)
+    print(json_object)
+
+    return json_object
 
     
 
