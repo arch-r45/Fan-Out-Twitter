@@ -21,7 +21,6 @@ Obviously in production, this is not how I would Authenticate Users or store pas
 """
 @app.post('/signup')
 def register(username:str, password:str):
-    "Check if Username Already Exists"
     user = cur.execute("SELECT username FROM Users WHERE (username = (?))", (username,))
     if user != None:
         return {"status": "Failure", "message": "Username already exists!"}
@@ -86,17 +85,19 @@ def update(user_id: str, tweet: str):
 """
 get_timeline in this naive approach has some fundamental problems as illustrated in DDIA.  When a user 
 requests their home timeline, all the tweets of the people they follow are looked up and merged and then 
-sorted by time.  The first version of Twitter used this approach, but the systems struggled to keep up
-with the crazy amount of get_timeline requests.  According to DDIA, the home timeline was 300k requests/s
-in 2012 while the post tweet or (update) was only 4.6k requests per second.  So Twitter had a lot more
-home timeline requests then post tweet requests which makes sense. Approach2.py has the optimization they 
-went with to prioritize the get_timeline operation.  
+sorted by time and returned to the User.  The first version of Twitter used this approach, but 
+the systems struggled to keep up with the crazy amount of get_timeline requests.  
+According to DDIA, the home timeline was 300k requests/s in 2012 while the post tweet or (update) 
+was only 4.6k requests per second. So Twitter had a lot more home timeline requests then post tweet 
+requests which makes sense. Approach2.py has the optimization they went with to prioritize the
+get_timeline operation.  
 
 Again, there are certain things about this that I would change in a real production example.  I would handle
 the sorting logic in my SQL query rather than my application code and I would place some type of LIMIT on
-the number of tweets returned.  (Most users on average only look through a small amount of recent tweets).
-That being said I would also include some type of pagination so I am not sending huge amounts of tweets over
-across the same network. 
+the number of tweets returned from the query.  
+(Most users on average only look through a small amount of recent tweets).
+I would also include some type of pagination so I am not sending enormous amounts of tweets over
+across the same network packet. 
 
 """
 
@@ -116,7 +117,6 @@ def get_timeline(user_id):
          
     time_sorted_array = sorted(array, key=lambda tweet_objects: tweet_objects[2][1], reverse=True)
 
-    print(time_sorted_array)
 
     for tweet in time_sorted_array:
         tweet[2][1] = datetime.fromtimestamp(tweet[2][1]).strftime('%Y-%m-%d %H:%M:%S')  
