@@ -32,7 +32,7 @@ WHERE user IN(
 
 ![alt text][twitter]
 
-[twitter]: https://github.com/arch-r45/Implementing-Trie-in-Redis-for-Fast-Prefix-Lookups--Glossary/blob/main/pictures/Twitter%20Search.png
+[twitter]: https://github.com/arch-r45/Fan-Out-Twitter/blob/main/pictures/Twitter-relational.png
 
 
 I implement this in approach1.py and to run locally see below.  
@@ -46,7 +46,7 @@ This is obviously very expensive with the large amount of reads, so we have to a
 
 ![alt text][twitter2]
 
-[twitter]: https://github.com/arch-r45/Implementing-Trie-in-Redis-for-Fast-Prefix-Lookups--Glossary/blob/main/pictures/Twitter%20Search.png
+[twitter2]: https://github.com/arch-r45/Fan-Out-Twitter/blob/main/pictures/twitter-redis-2.png
 
 
 
