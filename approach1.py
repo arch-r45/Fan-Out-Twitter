@@ -22,7 +22,8 @@ Obviously in production, this is not how I would Authenticate Users or store pas
 @app.post('/signup')
 def register(username:str, password:str):
     user = cur.execute("SELECT username FROM Users WHERE (username = (?))", (username,))
-    if user != None:
+    user_name= user.fetchall()
+    if user_name != []:
         return {"status": "Failure", "message": "Username already exists!"}
     user = UserModel(username, password)
     cur.execute("INSERT INTO Users (username, password) VALUES (?, ?)", (user.username, user.password))
