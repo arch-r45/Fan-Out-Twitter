@@ -40,8 +40,10 @@ I implement this in approach1.py and to run locally see below.
 uvicorn approach1:app --reload
 ```
 
-This is obviously very expensive with the large amount of reads, so we have to ask, can we do better? Twitter has the answer in approach 2, with using an in memory cache to store a list of tweets for each recipient user.  Everytime a user tweets something, look up all the people they follow and write a new tweet to their cache.  This obviously has a major advantage: not having to make a disk seek everytime a user wants to get their home timeline.  For twitter the most important load parameter is ensuring users get their home timeline as fast as possible.  If it takes a little longer to send a tweet to ensure users get their tweets fast, thats a tradeoff that is worth making, as there are way more requests to get tweets then to send tweets. 
+### Approach 2: In Memory Cache
 
+
+This is obviously very expensive with the large amount of reads, so we have to ask, can we do better? Twitter has the answer in approach 2, with using an in memory cache to store a list of tweets for each recipient user.  Everytime a user tweets something, look up all the people they follow and write a new tweet to their cache.  This obviously has a major advantage: not having to make a disk seek everytime a user wants to get their home timeline.  For twitter the most important load parameter is ensuring users get their home timeline as fast as possible.  If it takes a little longer to send a tweet to ensure users get their tweets fast, thats a tradeoff that is worth making, as there are way more requests to get tweets then to send tweets. The big downside here is now we are dealing with 345k writes per second to the home timeline cache on average.  But in the worst case, some users have 100s of millions of followers.  
 
 
 ![alt text][twitter2]
@@ -57,10 +59,12 @@ uvicorn approach2:app --reload
 ```
 
 
+### Conclusion
 
+As I said before, some users have a large amount of followers, Martin writes that Twitter adopts a hybrid approach that combines the two approaches layed out before.  For Users with signicant followers, they will not be written to the cache but rather fetched from disk when a user calls their timeline API, and these are merged together with the cached tweets as well.  
 
+#### Improvements
 
+Some of the big Improvements I want to add are a naive eviction protocol in Redis.  Use a Deque like data structure and evict in LIFO manner.  This makes sense as Tweets are written to the cache in order so it ensures you are making 0(1) constant time pops and getting rid of the right tweets when the cache is full.  The real twitter algorithim serves tweets in non most recent manner, and they may use an LFU(least frequently used) cache to evict the least frequently viewed tweet.  This would ensure that popular tweets continue to mantain in the cache to get served up quickly.
 
-
-
-
+If this was more of a production application, I would also implement writes to the cache only on Users that are currently online.  This would greatly reduce the number of writes per a particular tweet and used by Twitter currently.  
